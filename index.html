@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Likku Bhai Music Player 🎧</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="style.css" rel="stylesheet">
+  <style>
+    .slider-btn {
+      display: inline-block;
+      width: 50px;
+      height: 25px;
+      background: #ccc;
+      border-radius: 25px;
+      position: relative;
+      cursor: pointer;
+    }
+    .slider-btn::before {
+      content: '';
+      width: 20px;
+      height: 20px;
+      background: #fff;
+      border-radius: 50%;
+      position: absolute;
+      top: 2.5px;
+      left: 3px;
+      transition: 0.3s;
+    }
+    .slider-btn.active {
+      background: #000;
+    }
+    .slider-btn.active::before {
+      left: 25px;
+      background: #f1c40f;
+    }
+    #visualizer {
+      width: 100%;
+      height: 100px;
+      background: black;
+      margin-top: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-around;
+    }
+    .bar {
+      width: 5px;
+      height: 20px;
+      background: #f1c40f;
+      transition: height 0.5s;
+    }
+  </style>
+</head>
+<body>
+<div class="container text-center mt-5">
+  <img src="logo.png" alt="Logo" width="100">
+  <audio id="audioPlayer" src="Bujji.mp3"></audio>
+  <audio id="audioPlayer" src="Hilessa.mp3"></audio>
+  <audio id="audioPlayer" src="Yolo.mp3"></audio>
+  <div class="mt-4">
+    <button id="prevBtn" class="btn">
+      <img src="prev.png" alt="Previous" width="50">
+    </button>
+    <button id="nextBtn" class="btn">
+      <img src="next.png" alt="Next" width="50">
+    </button>
+    <button id="playPauseBtn" class="btn">
+      <img src="play.png" alt="Play" width="50">
+    </button>
+    <button id="shuffleBtn" class="btn">
+      <img src="shuffle.png" alt="Shuffle" width="50">
+    </button>
+  </div>
+
+  <div id="visualizer">
+    <div class="bar" style="Width:20px;">A</div>
+    <div class="bar" style="Width:20px;">U</div>
+    <div class="bar" style="Width:20px;">R</div>
+    <div class="bar" style="Width:20px;">A</div>
+    <div class="bar" style="Width:20px;">B</div>
+    <div class="bar" style="Width:20px;">E</div>
+    <div class="bar" style="Width:20px;">A</div>
+    <div class="bar" style="Width:20px;">T</div>
+  </div>
+
+  <div class="mt-3">
+    <input type="range" id="progressBar" value="0" max="100" class="form-range">
+    <p id="timer">00:00 / 00:00</p>
+  </div>
+
+  <div class="mt-3">
+    <label for="volumeControl">System Volume:</label>
+    <input type="range" id="volumeControl" min="0" max="100" step="1" value="100" class="form-range">
+  </div>
+
+  <div class="mt-3">
+    <div id="darkModeSlider" class="slider-btn"></div>
+  </div>
+
+
+  
+</div>
+
+<script>
+let audio = document.getElementById("audioPlayer");
+let progressBar = document.getElementById("progressBar");
+let volumeControl = document.getElementById("volumeControl");
+let darkModeSlider = document.getElementById("darkModeSlider");
+let timer = document.getElementById("timer");
+let playPauseBtn = document.getElementById("playPauseBtn");
+let prevBtn = document.getElementById("prevBtn");
+let nextBtn = document.getElementById("nextBtn");
+//let shuffleBtn= document.getElementById("shuffleBtn");
+let bars = document.querySelectorAll(".bar");
+let isPlaying = false;
+let songs = ["bujji.mp3", "hilessa.mp3", "yolo.mp3"];
+let currentSongIndex = 0;
+
+playPauseBtn.onclick = function () {
+  if (isPlaying) {
+    audio.pause();
+    playPauseBtn.innerHTML = '<img src="play.png" alt="Play" width="50">';
+  } else {
+    audio.play();
+    playPauseBtn.innerHTML = '<img src="pause.png" alt="Pause" width="50">';
+    
+  }
+  isPlaying = !isPlaying;
+};
+
+prevBtn.onclick = function () {
+  currentSongIndex = (currentSongIndex - 1 + songs.length) % songs.length;
+  audio.src = songs[currentSongIndex];
+  audio.play();
+  isPlaying = true;
+  playPauseBtn.innerHTML = '<img src="pause.png" alt="Pause" width="50">';
+};
+
+nextBtn.onclick = function () {
+  currentSongIndex = (currentSongIndex + 1) % songs.length;
+  audio.src = songs[currentSongIndex];
+  audio.play();
+  isPlaying = true;
+  playPauseBtn.innerHTML = '<img src="pause.png" alt="Pause" width="50">';
+};
+
+
+
+volumeControl.oninput = function () {
+  audio.volume = volumeControl.value / 100;
+};
+
+progressBar.oninput = function () {
+  audio.currentTime = (progressBar.value / 100) * audio.duration;
+};
+
+audio.ontimeupdate = function () {
+  let percentage = (audio.currentTime / audio.duration) * 100;
+  progressBar.value = percentage;
+  timer.innerText = formatTime(audio.currentTime) + " / " + formatTime(audio.duration);
+  visualize();
+};
+
+function formatTime(seconds) {
+  let min = Math.floor(seconds / 60);
+  let sec = Math.floor(seconds % 60);
+  return (min < 10 ? "0" : "") + min + ":" + (sec < 10 ? "0" : "") + sec;
+}
+
+function visualize() {
+  bars.forEach(bar => {
+    bar.style.height = Math.random() * 100 + "px";
+  });
+}
+
+darkModeSlider.onclick = function () {
+  document.body.classList.toggle("bg-dark");
+  document.body.classList.toggle("text-light");
+  darkModeSlider.classList.toggle("active");
+};
+
+</script>
+</body>
+</html>
